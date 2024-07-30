@@ -24,6 +24,7 @@ Install Rust by running the following command:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
 
 
 ### Step 2: Install Solana CLI
@@ -31,13 +32,14 @@ Install the Solana CLI by executing:
 
 ```bash
 sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
+```
 
 Step 3: Run a Local Validator
 Start a local Solana validator for testing your programs:
 
-bash
-Copy code
+```bash
 solana-test-validator
+```
 Setting Up Your Project
 Creating a Solana DApp
 You can scaffold a new Solana project using:
