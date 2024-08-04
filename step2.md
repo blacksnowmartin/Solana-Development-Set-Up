@@ -1,216 +1,236 @@
-The Solana test validator is a local emulator for the Solana blockchain, designed to provide developers with a private and controlled environment for building and testing Solana programs without the need to connect to a public testnet or mainnet. If you have the Solana CLI tool suite already installed, you can run the test validator with the following command:
+```markdown
+# Quick Start Guide: Setting Up Your Local Development Environment for Solana
 
+This guide will demonstrate how to quickly install and set up your local development environment, getting you ready to start developing and deploying Solana programs to the blockchain.
+
+## What You Will Learn
+- How to install the Solana CLI locally
+- How to set up a localhost Solana cluster/validator
+- How to create a Solana wallet for developing
+- How to airdrop SOL tokens for your wallet
+
+**Info**: If you are very new to development in general, or have only tried EVM-based blockchain development, your machine is likely not yet ready to help you code on Solana.
+
+This guide will mainly cover three operating systems: Windows (using WSL), Linux, and macOS. Between each of these operating systems, the broad steps to get set up locally are largely the same:
+
+- Install dependencies
+- Install Rust and Cargo toolchain
+- Install Solana CLI
+- Install Anchor
+- Set up a local blockchain cluster
+- Create a filesystem wallet
+- Airdrop Solana tokens to your wallet
+
+## 1. Installing Dependencies
+
+Just because Rust compiles and builds your software into a binary that can run for the computer architecture we specify, we need to install some OS-level dependencies on our machine.
+
+### Dependencies for Windows
+
+You can get started with Solana on Windows with WSL, the Windows subsystem for Linux. WSL allows you to run Linux software easily on Windows using a lightweight VM that instantly starts when you need it.
+
+#### Setup WSL for Solana Development
+
+First, start with installing WSL on your system. Be sure to restart your computer when installation is done, then continue this guide.
+
+```sh
+wsl --install
+```
+
+After installing WSL and restarting your computer, open a new Linux terminal session using WSL:
+
+```sh
+wsl
+```
+
+For the remainder of this guide and your Solana development using WSL, you will run all your commands, Solana builds, and program deployments inside this Linux terminal (except where otherwise noted in this guide).
+
+If you are using VS Code as your code editor of choice, we recommend you follow this [tutorial on the VS Code website](https://code.visualstudio.com/docs/remote/wsl) to properly configure VS Code and WSL together. This will give you the best developer experience.
+
+**Notice**: After the following section below about setting up WSL for Solana development, Windows/WSL users should continue to follow the Linux steps in this guide, except where otherwise noted.
+
+Inside your Linux/WSL terminal session, continue to set up your local Solana development environment using the "Linux" steps below.
+
+WSL can sometimes be a little slow due to its file system write speed limitations. You can also try dual booting your computer, installing a Linux operating system natively on the same machine, or using the full web browser-based Solana IDE called Solana Playground.
+
+### Dependencies for Linux
+
+Install the following dependencies on your Linux system:
+
+```sh
+sudo apt-get install -y \
+    build-essential \
+    pkg-config \
+    libudev-dev \
+    llvm \
+    libclang-dev \
+    protobuf-compiler \
+    libssl-dev
+```
+
+### Dependencies for macOS
+
+In macOS, build tools are provided by Xcode command line tools, which you can download directly from Apple. You will likely need to sign in with your Apple ID to download.
+
+You can check if the Xcode CLI is installed via this command:
+
+```sh
+xcode-select -p
+```
+
+If you don't see a path returned, you need to install the CLI tools.
+
+#### There are Three Ways to Install Xcode CLI Tools
+
+- Installing via your terminal using the following command:
+    ```sh
+    xcode-select --install
+    ```
+- Download the installer and install it with a graphical interface from [Apple Developer Tools](https://developer.apple.com/download/more/)
+- Installing via Homebrew:
+    ```sh
+    brew install xcode-select
+    ```
+
+**Congrats**: You have now installed system dependencies and build essentials required for Solana program development.
+
+## 2. Install Rust
+
+The Rust programming language is a multi-paradigm, general-purpose programming language that emphasizes performance, type safety, and concurrency.
+
+Using `rustup`, the official Rust version installer and manager, we will install `rustc` (the compiler for Rust) and `cargo` (the package manager for Rust) all at once.
+
+### Install Rust for macOS, Linux, WSL, or Another Unix-like OS
+
+Using the following command, we can install and configure the Rust tooling on your local system. The following command will automatically download the correct binaries needed for your specific operating system:
+
+```sh
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+```
+
+As part of this Rust installer, Rustup will also configure your terminal's PATH to include the Rust toolchain.
+
+After the installation is complete, restart your terminal or run the following command to manually refresh your new PATH settings to make the Rust tooling (like `cargo`) available:
+
+```sh
+source ~/.bashrc
+```
+
+## 3. Install the Solana CLI
+
+For local development, including compiling your Solana programs, you will need to install the Solana CLI. This command-line tool suite provides all the commands needed to perform common tasks, like:
+
+- Creating and managing file-system Solana wallets/keypairs
+- Connecting to Solana clusters
+- Building Solana programs
+- Deploying your programs to the blockchain
+
+### For Linux, macOS, WSL, or Other Unix-like Systems
+
+Install the Solana CLI tool suite using the official install command:
+
+```sh
+sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
+```
+
+You can replace `stable` with the release tag matching the software version of your desired release (e.g., `v1.18.1`), or use one of the three symbolic channel names: `stable`, `beta`, or `edge`.
+
+Depending on your specific operating system, the Solana CLI installer messaging may prompt you to update the PATH environment.
+
+Please update your PATH environment variable to include the Solana programs:
+
+If you get the above message, simply copy and paste the command recommended by the Solana CLI installer to update your PATH environment variable.
+
+After running this command, restart your terminal to make sure your Solana binaries are accessible in all the terminal sessions you open afterward.
+
+To check if your installation was successful, check the Solana CLI version:
+
+```sh
+solana --version
+```
+
+You can see more versions and releases according to the target [Solana releases](https://docs.solana.com/cli/releases).
+
+### Updating the Solana CLI
+
+In the future, you can use the Solana CLI to update itself based on which latest version is available:
+
+```sh
+solana-install update
+```
+
+## 4. Install Anchor for Solana
+
+Anchor is a framework for the Solana runtime providing several convenient developer tools for writing on-chain programs. It helps you write programs with less code since it has abstracted away a lot of security checks and common boilerplate using Rust's macros.
+
+To install and manage Anchor versions, we will use `avm`, the Anchor version manager. Since `avm` is installed via `cargo` (the Rust package manager), the installation steps will be the same for all the operating systems.
+
+We can then use `avm` to install the desired version of the Anchor framework.
+
+### Install `avm`
+
+```sh
+cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+```
+
+### Install Anchor Using `avm`
+
+To install the latest version of Anchor using `avm`:
+
+```sh
+avm install latest
+avm use latest
+```
+
+After the Anchor installation is complete, you can verify Anchor was installed by checking the installed version:
+
+```sh
+anchor --version
+```
+
+If you do not see an output or receive an error, you may need to restart your terminal.
+
+## 5. Setup a Localhost Blockchain Cluster
+
+The Solana CLI comes with the test validator built-in. This command line tool will allow you to run a full blockchain cluster on your machine:
+
+```sh
 solana-test-validator
+```
 
-Advantages #
-Ability to reset the blockchain state at any moment
-Ability to simulate different network conditions
-No RPC rate-limits
-No airdrop limits
-Direct on-chain program deployment
-Ability to clone accounts from a public cluster
-Ability to load accounts from files
-Configurable transaction history retention
-Configurable epoch length
-Installation #
-Since the solana-test-validator is part of the Solana CLI tool suite, ensure you have Solana's command-line tools installed. You can install them using the following command:
+**Pro Tip**: Run the Solana test validator in a new/separate terminal window that will remain open. This command line program must remain running for your localhost cluster to remain online and ready to process transactions and requests (like deploying programs).
 
-sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+Configure your Solana CLI to use your localhost validator for all your future terminal commands:
 
-You can replace stable with the release tag matching the software version of your desired release (i.e. v1.18.12), or use one of the three symbolic channel names: stable, beta, or edge.
+```sh
+solana config set --url localhost
+```
 
-Info
-For more detailed instructions, checkout this guide on setting up your local environment for Solana development. It includes installing the Solana CLI, Anchor, getting a local keypair, and more.
+At any time, you can view your current Solana CLI configuration settings:
 
-Starting the Test Validator #
-To start your local validator, simply run:
+```sh
+solana config get
+```
 
-solana-test-validator
+## 6. Create a File System Wallet
 
-This command initializes a new ledger and starts the validator.
+To deploy a program with Solana CLI, you will need a Solana wallet with SOL tokens to pay for the cost of transactions and data storage on the blockchain.
 
-Interacting with a Running Test Validator #
-Once you have the solana-test-validator up and running, you can interact with it using various Solana CLI (Command Line Interface) commands. These commands let you deploy programs, manage accounts, send transactions, and much more. Here’s a detailed guide on the key commands you will use.
+Let's create a simple file system wallet to use during local development:
 
-Checking the Status of the Test Validator #
-Before interacting with the test validator, it's useful to confirm its status and ensure it is running correctly.
-
-solana ping
-
-This command pings the local test validator and returns the current blockhash and latency, verifying that it is active.
-
-Account Management #
-To create a new keypair (account), use:
-
+```sh
 solana-keygen new
+```
 
-This command creates a new keypair and saves it to the specified file.
+By default, the `solana-keygen` command will create a new file system wallet located at `~/.config/solana/id.json`. You can manually specify the output file location using the `--outfile /path` option.
 
-To add SOL to your account:
+**Info**: If you already have a file system wallet saved at the default location, this command will NOT override it unless you explicitly force override using the `--force` flag.
 
-solana airdrop 10 <ACCOUNT_ADDRESS>
+### Set Your New Wallet as the Default
 
-To retrieve details about an account, such as its balance and owner:
+With your new file system wallet created, you must tell the Solana CLI to use this wallet to deploy and take ownership of your on-chain program:
 
-solana account <ACCOUNT_ADDRESS>
+```sh
+solana config set -k ~/.config/solana/id.json
+```
 
-You must first airdrop funds to the account for the account to exist.
-
-This command sends 10 SOL to the specified account address.
-
-Deploying and Managing Programs #
-To deploy a compiled program (BPF) to the test validator:
-
-solana program deploy <PROGRAM_FILE_PATH>
-
-This uploads and deploys a program to the blockchain.
-
-To check the details of a deployed program:
-
-solana program show <ACCOUNT_ADDRESS>
-
-Sending Transactions #
-To transfer SOL from one account to another:
-
-solana transfer --from /path/to/keypair.json <RECIPIENT_ADDRESS> <AMOUNT>
-
-This sends AMOUNT of SOL from the source account to the RECIPIENT_ADDRESS.
-
-Simulating and Confirming Transactions #
-Before actually sending a transaction, you can simulate it to see if it would succeed:
-
-solana transfer --from /path/to/keypair.json --simulate <RECIPIENT_ADDRESS> <AMOUNT>
-
-To confirm the details and status of a transaction:
-
-solana confirm <TRANSACTION_SIGNATURE>
-
-Viewing Recent Block Production #
-To see information about recent block production, which can be useful for debugging performance issues:
-
-solana block-production
-
-Creating Token Accounts #
-Adjusting Logs #
-For debugging, you might want more detailed logs:
-
-solana logs
-
-This streams log messages from the validator.
-
-Useful Tips Logging:
-
-Increase log verbosity with the -v flag if you need more detailed output for debugging.
-Use the --rpc-port and --rpc-bind-address options to customize the RPC server settings.
-Adjust the number of CPU cores used by the validator with the --gossip-host option to simulate network conditions more realistically.
-Configuration #
-Check CLI Tool Suite configuration:
-
-solana genesis-hash
-
-View all the configuration options available for the Solana test validator:
-
-solana-test-validator --help
-
-Local Ledger #
-By default, the ledger data is stored in a directory named test-ledger in your current working directory.
-
-Specifying Ledger Location #
-When starting the test validator, you can specify a different directory for the ledger data using the --ledger option:
-
-solana-test-validator --ledger /path/to/custom/ledger
-
-Resetting the Ledger #
-By default the validator will resume an existing ledger. To reset the ledger, you can either manually delete the ledger directory or restart the validator with the --reset flag:
-
-solana-test-validator --reset
-
-If the ledger exists, this command will reset the ledger to genesis, which resets the state by deleting all existing data and starting fresh.
-
-Runtime Features #
-Solana has a feature set mechanism that allows you to enable or disable certain blockchain features when running the test validator. By default, the test validator runs with all runtime features activated.
-
-To query the runtime feature status:
-
-solana feature status <ADDRESS>
-
-ADDRESS is the feature status to query [default: all known features]
-To activate a specific feature:
-
-solana feature activate <FEATURE_KEYPAIR> <CLUSTER>
-
-FEATURE_KEYPAIR is the signer for the feature to activate
-CLUSTER is the cluster to activate the feature on
-To deactivate specific features in genesis:
-
-solana-test-validator --deactivate-feature <FEATURE_PUBKEY> --reset
-
-This must be done on a fresh ledger, so if a ledger already exists in your working directory you must add the --reset flag to reset to genesis.
-
-Changing Versions #
-To check your current solana-test-validator version:
-
-solana-test-validator --version
-
-Your solana-test-validator runs on the same version as the Solana CLI version.
-
-To test your programs against different versions of the Solana runtime, you can install multiple versions of the Solana CLI and switch between them using the solana-install set command:
-
-solana-install init <VERSION>
-
-VERSION is the desired CLI version to install
-Make sure to restart your Solana test validator after changing versions to ensure it runs the correct version.
-
-Cloning Programs #
-To add existing onchain programs to your local environment, you can clone the program with a new ledger.
-
-To clone an account from the cluster:
-
-solana-test-validator --clone PROGRAM_ADDRESS --url CLUSTER_PROGRAM_IS_DEPLOYED_TO
-
-This is useful for testing interactions with standard programs.
-
-If a ledger already exists in your working directory, you must reset the ledger to be able to clone a program.
-
-To clone an account from the cluster when a ledger already exists:
-
-solana-test-validator --clone PROGRAM_ADDRESS --url CLUSTER_PROGRAM_IS_DEPLOYED_TO --reset
-
-To clone an upgradeable program and its executable data from the cluster:
-
-solana-test-validator --clone-upgradeable-program PROGRAM_ADDRESS --url CLUSTER_PROGRAM_IS_DEPLOYED_TO
-
-Resetting State on Accounts at Startup #
-By default the validator will resume an existing ledger (if present). But during startup, you can reset the ledger either to genesis or to specific account state that you provide.
-
-Reset to Genesis #
-To reset the ledger to the genesis state:
-
-solana-test-validator --reset
-
-Reset to Specific Accounts #
-To reset the state of specific accounts every time you start the validator, you can use a combination of account snapshots and the --account flag.
-
-First, save the desired state of an account as a JSON file:
-
-solana account PROGRAM_ADDRESS --output json > account_state.json
-
-Then load this state each time you reset the validator:
-
-solana-test-validator --reset --account PROGRAM_ADDRESS account_state.json
-
-Solana CLI Commands #
-To view all CLI commands and see other ways to interact with the test validator:
-
-solana --help
-
-This command list all flags, options, and subcommands available.
-
-Example Use Case #
-Create a USDC Token Account on your localnet
-
-Clone the USDC mint address to your local validator
-solana-test-validator --clone EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v --url mainnet-beta --reset
-
-Create a token account
-spl-token create-account EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v --url localhost
