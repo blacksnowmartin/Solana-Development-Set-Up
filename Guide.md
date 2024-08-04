@@ -65,19 +65,14 @@ Go: solana-go
 Example Commands
 Compile your onchain program:
 
-bash
-Copy code
+```bash
 cargo build-bpf
+```
 Deploy your onchain program:
 
-bash
-Copy code
+```bash
 solana program deploy /path/to/your/program.so
-Useful Resources
-Solana Documentation
-Solana Cookbook
-Solana StackExchange
-Contributing
+```
+
 We welcome contributions! Please read our contributing guidelines for more details.
 
-License
