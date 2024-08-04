@@ -44,9 +44,9 @@ Setting Up Your Project
 Creating a Solana DApp
 You can scaffold a new Solana project using:
 
-bash
-Copy code
+```bash
 npx create-solana-dapp <project-name>
+```
 This command generates a new project with all necessary files and basic configurations.
 
 Development Workflow
