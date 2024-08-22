@@ -76,3 +76,6 @@ solana program deploy /path/to/your/program.so
 
 We welcome contributions! Please read our contributing guidelines for more details.
 
+Thanks for following up tothe end.
+
+
